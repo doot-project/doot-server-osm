@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OSM GTPS Public &bull; Anti-Stuck Cache</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <div class="brand">
+        <span class="logo">⚡</span>
+        <div>
+          <h1>OSM GTPS Public</h1>
+          <p class="subtitle">Public Cache Server &bull; Semua Source GTPS</p>
+        </div>
+      </div>
+      <div class="status-badge">
+        <span class="dot"></span> Online
+      </div>
+    </header>
+
+    <!-- Main Card: OSM LINK & OSM PATH -->
+    <section class="card primary-card">
+      <h2>🌐 OSM LINK &amp; OSM PATH (Gunakan di Source GTPS Anda)</h2>
+      <p class="card-desc">Salin OSM Link dan OSM Path di bawah ini ke source server GTPS Anda agar pemain tidak stuck saat login.</p>
+
+      <div class="osm-grid">
+        <!-- OSM Link -->
+        <div class="osm-item">
+          <span class="label">🔗 OSM LINK</span>
+          <div class="input-box">
+            <code id="valOsmLink">http://172.232.228.96:3000/</code>
+            <button class="btn btn-copy" data-target="valOsmLink">Salin</button>
+          </div>
+        </div>
+
+        <!-- OSM Path: IP RDP/cache/ -->
+        <div class="osm-item">
+          <span class="label">📁 OSM PATH (IP RDP/cache/)</span>
+          <div class="input-box">
+            <code id="valOsmPath" class="text-emerald">172.232.228.96:3000/cache/</code>
+            <button class="btn btn-copy" data-target="valOsmPath">Salin</button>
+          </div>
+        </div>
+
+        <!-- Hash items.dat -->
+        <div class="osm-item">
+          <span class="label">🔢 HASH ITEMS.DAT</span>
+          <div class="input-box">
+            <code id="valHashSigned" class="text-emerald">-</code>
+            <button class="btn btn-copy" data-target="valHashSigned">Salin</button>
+          </div>
+          <span class="sub-text" id="valHashHex">Hex: -</span>
+        </div>
+
+        <!-- Download items.dat -->
+        <div class="osm-item">
+          <span class="label">📦 DOWNLOAD ITEMS.DAT</span>
+          <div class="input-box">
+            <span id="valItemsSize">Memuat...</span>
+            <a href="/items.dat?download=1" class="btn btn-emerald" id="btnDownload">Unduh</a>
+          </div>
+          <span class="sub-text" id="valItemCount">Total: - items</span>
+        </div>
+      </div>
+
+      <!-- Ubah IP RDP Form -->
+      <div class="rdp-config-row">
+        <div class="input-group">
+          <label>IP RDP / VPS Port:</label>
+          <input type="text" id="inputRdpIp" placeholder="172.232.228.96:3000">
+        </div>
+        <button class="btn btn-primary" id="btnSaveRdp">Simpan IP RDP</button>
+      </div>
+    </section>
+
+    <!-- Section Upload: items.dat & Cache Files -->
+    <section class="card">
+      <h2>📤 Upload items.dat &amp; File Cache</h2>
+      <p class="card-desc">Upload file <code>items.dat</code> atau file aset game (<code>.rttex</code>, audio <code>.wav</code>, atau <code>cache.zip</code> untuk otomatis diekstrak).</p>
+
+      <div class="upload-grid">
+        <!-- Upload items.dat -->
+        <div class="dropzone" id="dropzoneItems">
+          <input type="file" id="fileItemsInput" accept=".dat">
+          <div class="dropzone-text">
+            <span class="icon">📦</span>
+            <h3>Upload items.dat</h3>
+            <p>Klik atau seret file <code>items.dat</code></p>
+            <span class="badge-tag">Auto Hash</span>
+          </div>
+        </div>
+
+        <!-- Upload Cache Aset / Zip -->
+        <div class="dropzone" id="dropzoneCache">
+          <input type="file" id="fileCacheInput" multiple>
+          <div class="dropzone-text">
+            <span class="icon">🎨</span>
+            <h3>Upload File Cache (.rttex / .zip)</h3>
+            <p>Klik atau seret file aset / <code>cache.zip</code></p>
+            <span class="badge-tag">Auto Ekstrak ZIP</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="toast" class="toast" style="display:none;"></div>
+    </section>
+
+    <!-- File Explorer Cache -->
+    <section class="card">
+      <div class="card-header">
+        <h2>📁 File di Folder /cache/</h2>
+        <button class="btn btn-sm btn-copy" id="btnRefreshFiles">🔄 Refresh</button>
+      </div>
+      <div class="table-wrap">
+        <table class="file-table">
+          <thead>
+            <tr>
+              <th>Nama File</th>
+              <th>Ukuran</th>
+              <th>Waktu Update</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="fileTableBody">
+            <tr><td colspan="4" class="text-center">Memuat file...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Code Snippets for All Sources -->
+    <section class="card">
+      <h2>💻 Kode OnSuperMain (Semua Source GTPS)</h2>
+      <p class="card-desc">Salin kode ini ke source GTPS Anda. Sudah otomatis terisi dengan <b>OSM LINK</b> dan <b>OSM PATH (IP RDP/cache/)</b>:</p>
+
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="tab-cpp">C++ (Proton)</button>
+        <button class="tab-btn" data-tab="tab-lua">Lua GTPS</button>
+        <button class="tab-btn" data-tab="tab-csharp">C# (.NET)</button>
+        <button class="tab-btn" data-tab="tab-nodejs">Node.js</button>
+      </div>
+
+      <div class="tab-content">
+        <div class="pane active" id="tab-cpp">
+          <div class="code-wrapper">
+            <pre><code id="codeCpp">// Memuat C++...</code></pre>
+            <button class="btn btn-sm btn-code-copy" data-target="codeCpp">Copy C++</button>
+          </div>
+        </div>
+        <div class="pane" id="tab-lua">
+          <div class="code-wrapper">
+            <pre><code id="codeLua">-- Memuat Lua...</code></pre>
+            <button class="btn btn-sm btn-code-copy" data-target="codeLua">Copy Lua</button>
+          </div>
+        </div>
+        <div class="pane" id="tab-csharp">
+          <div class="code-wrapper">
+            <pre><code id="codeCSharp">// Memuat C#...</code></pre>
+            <button class="btn btn-sm btn-code-copy" data-target="codeCSharp">Copy C#</button>
+          </div>
+        </div>
+        <div class="pane" id="tab-nodejs">
+          <div class="code-wrapper">
+            <pre><code id="codeNodejs">// Memuat Node.js...</code></pre>
+            <button class="btn btn-sm btn-code-copy" data-target="codeNodejs">Copy Node.js</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <p>OSM GTPS Public &bull; Anti-Stuck Cache &bull; Siap untuk Semua Source</p>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
