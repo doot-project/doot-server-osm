@@ -1,0 +1,7 @@
+{
+  "server_name": "Universal OSM GTPS",
+  "fixed_web_url": "https://name-web.vercel.app",
+  "gtps_ip": "172.232.228.96",
+  "gtps_port": 17091,
+  "sub_url": "cache/src/"
+}
